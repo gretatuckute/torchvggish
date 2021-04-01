@@ -55,13 +55,11 @@ class SaveOutput:
 	def detach_one_activation(self, layer_name):
 		return self.activations[layer_name].detach().numpy()
 	
-	def detach_activations(self, lstm_output='recent'):
+	def detach_activations(self):
 		"""
 		Detach activations (from tensors to numpy)
 
 		Arguments:
-			lstm_output: for LSTM, can output either the hidden states throughout sequence ('sequence')
-						or the most recent hidden states ('recent')
 
 		Returns:
 			detached_activations = for each layer, the flattened activations
@@ -69,8 +67,7 @@ class SaveOutput:
 		"""
 		detached_activations = {}
 		
-		relu_4d = [0, 1, 2, 3, 4,
-				   5]  # the first 6 ReLu layers are 4d, and needs to be averaged differently than the last 3 ReLu
+		relu_4d = [0, 1, 2, 3, 4, 5]  # the first 6 ReLu layers are 4d, and needs to be averaged differently than the last 3 ReLu
 		
 		# testing:
 		# activations = self.activations[
@@ -137,7 +134,7 @@ class SaveOutput:
 		if not (Path(RESULTDIR)).exists():
 			os.makedirs((Path(RESULTDIR)))
 		
-		filename = os.path.join(RESULTDIR, f'{identifier}_activations.pkl')
+		filename = os.path.join(RESULTDIR, f'{identifier}_activations_ReLufix.pkl')
 		
 		with open(filename, 'wb') as f:
 			pickle.dump(self.detached_activations, f)
