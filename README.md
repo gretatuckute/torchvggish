@@ -20,6 +20,10 @@ except: urllib.request.urlretrieve(url, filename)
 model.forward(filename)
 ```
 
+To extract activations from multiple sounds, use run_model.py. 
+
+Edits to the original model: ReLU activations were changed to not be performed inplace.
+
 <hr>
 [1]  S. Hershey et al., ‘CNN Architectures for Large-Scale Audio Classification’,\
     in International Conference on Acoustics, Speech and Signal Processing (ICASSP),2017\

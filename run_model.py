@@ -11,8 +11,8 @@ from os.path import isfile, join
 # import extractor hook functions
 from extractor_utils import SaveOutput
 
-RESULTDIR = '/Users/gt/Documents/GitHub/control-neural/control-neural/model-actv-control/VGGish/'
-DATADIR = '/Users/gt/Documents/GitHub/control-neural/data/stimuli/165_natural_sounds_16kHz/'
+RESULTDIR = '/Users/gt/Documents/GitHub/aud-dnn/aud_dnn/model-actv/VGGish/'
+DATADIR = '/Users/gt/Documents/GitHub/aud-dnn/data/stimuli/165_natural_sounds_16kHz/'
 
 files = [f for f in listdir(DATADIR) if isfile(join(DATADIR, f))]
 wav_files = [f for f in files if f.endswith('wav')]
