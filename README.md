@@ -24,6 +24,8 @@ To extract activations from multiple sounds, use run_model.py.
 
 Edits to the original model: ReLU activations were changed to not be performed inplace.
 
+To run random network: in the vggish.py script, line 146 (class VGGish), comment out the random permutation.
+
 <hr>
 [1]  S. Hershey et al., ‘CNN Architectures for Large-Scale Audio Classification’,\
     in International Conference on Acoustics, Speech and Signal Processing (ICASSP),2017\
