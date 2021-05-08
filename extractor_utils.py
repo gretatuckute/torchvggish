@@ -3,12 +3,14 @@ import numpy as np
 import warnings
 from pathlib import Path
 import os
+import matplotlib.pyplot as plt
 
 class SaveOutput:
-	def __init__(self):
+	def __init__(self, avg_type='avg'):
 		self.outputs = []
 		self.activations = {}  # create a dict with module name
 		self.detached_activations = None
+		self.avg_type = avg_type
 	
 	def __call__(self, module, module_in, module_out):
 		"""
@@ -69,16 +71,14 @@ class SaveOutput:
 		
 		relu_4d = [0, 1, 2, 3, 4, 5]  # the first 6 ReLu layers are 4d, and needs to be averaged differently than the last 3 ReLu
 		
-		# testing:
-		# activations = self.activations[
-		#     'Conv2d(1, 32, kernel_size=(41, 11), stride=(2, 2), padding=(20, 5))--0'].detach().numpy()
-		
 		for k, v in self.activations.items():
 			# print(f'Shape {k}: {v.detach().numpy().shape}')
 			print(f'Detaching activation for layer: {k}')
+			activations = v.detach().numpy()
+			if self.avg_type == 'avg_power':
+				activations = activations**2
+			
 			if k.startswith('Conv2d') or k.startswith('MaxPool2d'):
-				activations = v.detach().numpy()
-				
 				# reshape to [frames; height (time); channels; mel bins]
 				actv_reshape = np.moveaxis(activations, 2, 1)
 				
@@ -90,13 +90,15 @@ class SaveOutput:
 				actv_avg1 = np.mean(actv_expand, axis=1)
 				actv_avg2 = np.mean(actv_avg1, axis=0)
 				
+				if self.avg_type == 'power_avg':
+					actv_avg2 = np.sqrt(actv_avg2)
+				
 				detached_activations[k] = actv_avg2
 			
 			if k.startswith('ReLU'):
 				k_split = int(k.split('--')[1])
 				if k_split in relu_4d:
-					activations = v.detach().numpy()
-					
+					assert (np.min(activations) == 0)
 					# reshape to [frames; height (time); channels; mel bins]
 					actv_reshape = np.moveaxis(activations, 2, 1)
 					
@@ -108,20 +110,25 @@ class SaveOutput:
 					actv_avg1 = np.mean(actv_expand, axis=1)
 					actv_avg2 = np.mean(actv_avg1, axis=0)
 					
+					if self.avg_type == 'power_avg':
+						actv_avg2 = np.sqrt(actv_avg2)
+					
 					detached_activations[k] = actv_avg2
 				else:
 					print(f'Not 4d ReLu. Layer number {k_split}')
-					activations = v.detach().numpy()
-					
 					# mean over frames
 					actv_avg1 = np.mean(activations, axis=0)
+					if self.avg_type == 'power_avg':
+						actv_avg1 = np.sqrt(actv_avg1)
+					
 					detached_activations[k] = actv_avg1
 			
 			if k.startswith('Linear'):
-				activations = v.detach().numpy()
-				
 				# mean over frames
 				actv_avg1 = np.mean(activations, axis=0)
+				if self.avg_type == 'power_avg':
+					actv_avg1 = np.sqrt(actv_avg1)
+				
 				detached_activations[k] = actv_avg1
 		
 		self.detached_activations = detached_activations
@@ -134,8 +141,9 @@ class SaveOutput:
 		if not (Path(RESULTDIR)).exists():
 			os.makedirs((Path(RESULTDIR)))
 			
-		# filename = os.path.join(RESULTDIR, f'{identifier}_activations.pkl')
-		filename = os.path.join(RESULTDIR, f'{identifier}_activations_randnetw.pkl')
-		
+		# filename = os.path.join(RESULTDIR, f'{identifier}_activations_inplaceReLUfalse.pkl')
+		# filename = os.path.join(RESULTDIR, f'{identifier}_activations_randnetw.pkl')
+		filename = os.path.join(RESULTDIR, f'{identifier}_{self.avg_type}_activations.pkl')
+
 		with open(filename, 'wb') as f:
 			pickle.dump(self.detached_activations, f)

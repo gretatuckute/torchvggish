@@ -11,6 +11,12 @@ from os.path import isfile, join
 # import extractor hook functions
 from extractor_utils import SaveOutput
 
+import random
+np.random.seed(0)
+random.seed(0)
+torch.manual_seed(0)
+torch.cuda.manual_seed(0)
+
 RESULTDIR = '/Users/gt/Documents/GitHub/aud-dnn/aud_dnn/model-actv/VGGish/'
 DATADIR = '/Users/gt/Documents/GitHub/aud-dnn/data/stimuli/165_natural_sounds_16kHz/'
 
@@ -18,12 +24,13 @@ files = [f for f in listdir(DATADIR) if isfile(join(DATADIR, f))]
 wav_files = [f for f in files if f.endswith('wav')]
 
 model = torch.hub.load('harritaylor/torchvggish', 'vggish')
-model.eval()
 
 ### LOOP OVER AUDIO FILES ###
 for filename in wav_files:
+	model.eval()
+	
 	# write hooks for the model
-	save_output = SaveOutput()
+	save_output = SaveOutput(avg_type='avg_power')
 	
 	hook_handles = []
 	layer_names = []
