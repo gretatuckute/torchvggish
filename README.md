@@ -20,11 +20,15 @@ except: urllib.request.urlretrieve(url, filename)
 model.forward(filename)
 ```
 
-To extract activations from multiple sounds, use run_model.py. 
+## Model activation extraction
+To extract activations from multiple sound files, use run_model.py. 
 
 Edits to the original model: ReLU activations were changed to not be performed inplace.
 
-To run random network: in the vggish.py script, line 146 (class VGGish), comment out the random permutation.
+To run random network: In the vggish.py script, it is possible to generate randomly permuted tensors for the VGGish architecture (line 137, class VGGish). The permuted architecture can be loaded in lines 147-156 (class VGGish, remove the commented parts).
+
+*Note*: When I downloaded the pretrained weights and scripts under /torchvggish/ these were automatically placed under /Users/{USER}/.cache/torch/hub/harritaylor_torchvggish_master/.
+
 
 <hr>
 [1]  S. Hershey et al., ‘CNN Architectures for Large-Scale Audio Classification’,\
