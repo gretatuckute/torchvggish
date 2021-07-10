@@ -141,9 +141,8 @@ class SaveOutput:
 		if not (Path(RESULTDIR)).exists():
 			os.makedirs((Path(RESULTDIR)))
 			
-		# filename = os.path.join(RESULTDIR, f'{identifier}_activations_inplaceReLUfalse.pkl')
 		# filename = os.path.join(RESULTDIR, f'{identifier}_activations_randnetw.pkl')
-		filename = os.path.join(RESULTDIR, f'{identifier}_{self.avg_type}_activations.pkl')
+		filename = os.path.join(RESULTDIR, f'{identifier}_activations.pkl')
 
 		with open(filename, 'wb') as f:
 			pickle.dump(self.detached_activations, f)

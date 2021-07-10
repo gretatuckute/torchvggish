@@ -1,10 +1,5 @@
 import torch
-import pickle
-import matplotlib.pyplot as plt
 import numpy as np
-import warnings
-from pathlib import Path
-import os
 from os import listdir
 from os.path import isfile, join
 
@@ -29,8 +24,8 @@ model = torch.hub.load('harritaylor/torchvggish', 'vggish')
 for filename in wav_files:
 	model.eval()
 	
-	# write hooks for the model
-	save_output = SaveOutput(avg_type='avg_power')
+	# Write hooks for the model
+	save_output = SaveOutput(avg_type='avg')
 	
 	hook_handles = []
 	layer_names = []
@@ -39,39 +34,37 @@ for filename in wav_files:
 		# print(layer)
 		if isinstance(layer, torch.nn.modules.conv.Conv2d):
 			print('Fetching conv handles!\n')
-			handle = layer.register_forward_hook(save_output)  # save idx and layer
+			handle = layer.register_forward_hook(save_output)
 			hook_handles.append(handle)
 		if type(layer) == torch.nn.modules.ReLU:
 			print('Fetching ReLu handles!\n')
-			handle = layer.register_forward_hook(save_output)  # save idx and layer
+			handle = layer.register_forward_hook(save_output)
 			hook_handles.append(handle)
 		if type(layer) == torch.nn.modules.MaxPool2d:
 			print('Fetching MaxPool2d handles!\n')
-			handle = layer.register_forward_hook(save_output)  # save idx and layer
+			handle = layer.register_forward_hook(save_output)
 			hook_handles.append(handle)
 		if type(layer) == torch.nn.modules.Linear:
 			print('Fetching Linear handles!\n')
-			handle = layer.register_forward_hook(save_output)  # save idx and layer
+			handle = layer.register_forward_hook(save_output)
 			hook_handles.append(handle)
 	
+	# Run the forward pass
 	out_features = model.forward(DATADIR + filename)
 	processed_features = np.mean((out_features.detach().numpy()), axis=0)
 	
-	# act_keys = list(save_output.activations.keys())
-	# act_vals = save_output.activations
-	
-	# detach activations
+	# Detach activations
 	detached_activations = save_output.detach_activations()
 	
-	# add the postprocssed features
-	detached_activations['PostProcessed_Features'] = processed_features
+	# Add the post-processed features (AudioSet embeddings, performs PCA, whitening and quantization)
+	detached_activations['Post-Processed_Features'] = processed_features
 	
-	# sanity check sizes:
+	# Sanity check sizes:
 	for k, v in detached_activations.items():
 		print(f'Shape {k}: {v.shape}')
 	
-	# store and save activations
-	# get identifier (sound file name)
+	# Store and save activations
+	# Get identifier (sound file name)
 	id1 = filename.split('/')[-1]
 	identifier = id1.split('.')[0]
 	
