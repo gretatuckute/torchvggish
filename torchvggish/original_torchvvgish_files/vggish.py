@@ -2,16 +2,9 @@ import numpy as np
 import torch
 import torch.nn as nn
 from torch import hub
-import os
-import pickle
 
 from . import vggish_input, vggish_params
 
-import random
-np.random.seed(0)
-random.seed(0)
-torch.manual_seed(0)
-torch.cuda.manual_seed(0)
 
 class VGG(nn.Module):
     def __init__(self, features):
@@ -19,11 +12,11 @@ class VGG(nn.Module):
         self.features = features
         self.embeddings = nn.Sequential(
             nn.Linear(512 * 4 * 6, 4096),
-            nn.ReLU(inplace=False), # changed from True
+            nn.ReLU(True),
             nn.Linear(4096, 4096),
-            nn.ReLU(inplace=False),
+            nn.ReLU(True),
             nn.Linear(4096, 128),
-            nn.ReLU(inplace=False))
+            nn.ReLU(True))
 
     def forward(self, x):
         x = self.features(x)
@@ -120,54 +113,45 @@ def make_layers():
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
         else:
             conv2d = nn.Conv2d(in_channels, v, kernel_size=3, padding=1)
-            # layers += [conv2d, nn.ReLU(inplace=True)]
-            layers += [conv2d, nn.ReLU(inplace=False)] # changed to False
+            layers += [conv2d, nn.ReLU(inplace=True)]
             in_channels = v
     return nn.Sequential(*layers)
 
+
 def _vgg():
     return VGG(make_layers())
+
+
+# def _spectrogram():
+#     config = dict(
+#         sr=16000,
+#         n_fft=400,
+#         n_mels=64,
+#         hop_length=160,
+#         window="hann",
+#         center=False,
+#         pad_mode="reflect",
+#         htk=True,
+#         fmin=125,
+#         fmax=7500,
+#         output_format='Magnitude',
+#         #             device=device,
+#     )
+#     return Spectrogram.MelSpectrogram(**config)
+
 
 class VGGish(VGG):
     def __init__(self, urls, pretrained=True, preprocess=True, postprocess=True, progress=True):
         super().__init__(make_layers())
         if pretrained:
             state_dict = hub.load_state_dict_from_url(urls['vggish'], progress=progress)
-            
-            ## The following code was used to generate indices for random permutation ##
-            # d_rand_idx = {}  # create dict for storing the indices for random permutation
-            # for k, v in state_dict.items():
-            #     w = state_dict[k]
-            #     idx = torch.randperm(w.nelement())  # create random indices across all dimensions
-            #     d_rand_idx[k] = idx
-            #
-            # with open(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl'), 'wb') as f:
-            #     pickle.dump(d_rand_idx, f)
-            
-            # print('OBS! RANDOM NETWORK!')
-            #
-            # for k, v in state_dict.items():
-            #     w = state_dict[k]
-            #     # Load random indices
-            #     print(f'________ Loading random indices from permuted architecture for {k} ________')
-            #     d_rand_idx = pickle.load(open(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl'), 'rb'))
-            #     idx = d_rand_idx[k]
-            #     rand_w = w.view(-1)[idx].view(w.size()) # permute, and reshape back to original shape
-            #     state_dict[k] = rand_w
-
-            # # if visualizing:
-            # # import matplotlib.pyplot as plt
-            # # # plt.plot(state_dict[state_keys[1]].detach().numpy())
-            # # plt.plot(t.detach().numpy())
-            # # plt.show()
-            #
             super().load_state_dict(state_dict)
 
         self.preprocess = preprocess
         self.postprocess = postprocess
         if self.postprocess:
             self.pproc = Postprocessor()
-            if pretrained: # uses the pretrained postprocessing projections
+            if pretrained:
                 state_dict = hub.load_state_dict_from_url(urls['pca'], progress=progress)
                 # TODO: Convert the state_dict to torch
                 state_dict[vggish_params.PCA_EIGEN_VECTORS_NAME] = torch.as_tensor(
@@ -198,5 +182,3 @@ class VGGish(VGG):
 
     def _postprocess(self, x):
         return self.pproc(x)
-
-

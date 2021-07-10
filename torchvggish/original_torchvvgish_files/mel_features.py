@@ -217,12 +217,6 @@ def log_mel_spectrogram(data,
       fft_length=fft_length,
       hop_length=hop_length_samples,
       window_length=window_length_samples)
-  # import matplotlib.pyplot as plt
-  # 
-  # plt.figure()
-  # plt.imshow((mel_spectrogram.T), origin='lower')
-  # plt.show()
-  # 
   mel_spectrogram = np.dot(spectrogram, spectrogram_to_mel_matrix(
       num_spectrogram_bins=spectrogram.shape[1],
       audio_sample_rate=audio_sample_rate, **kwargs))
