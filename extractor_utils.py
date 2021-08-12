@@ -90,6 +90,11 @@ class SaveOutput:
 				actv_avg1 = np.mean(actv_expand, axis=1)
 				actv_avg2 = np.mean(actv_avg1, axis=0)
 				
+				# test averaging procedure (averaging different dimension first)
+				actv_avg1_test = np.mean(actv_expand, axis=0)
+				actv_avg2_test = np.mean(actv_avg1, axis=0)
+				np.sum(actv_avg2 == actv_avg2_test)
+				
 				if self.avg_type == 'power_avg':
 					actv_avg2 = np.sqrt(actv_avg2)
 				
