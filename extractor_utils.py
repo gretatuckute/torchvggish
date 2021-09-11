@@ -75,8 +75,6 @@ class SaveOutput:
 			# print(f'Shape {k}: {v.detach().numpy().shape}')
 			print(f'Detaching activation for layer: {k}')
 			activations = v.detach().numpy()
-			if self.avg_type == 'avg_power':
-				activations = activations**2
 			
 			if k.startswith('Conv2d') or k.startswith('MaxPool2d'):
 				# reshape to [frames; height (time); channels; mel bins]
@@ -91,12 +89,9 @@ class SaveOutput:
 				actv_avg2 = np.mean(actv_avg1, axis=0)
 				
 				# test averaging procedure (averaging different dimension first)
-				actv_avg1_test = np.mean(actv_expand, axis=0)
-				actv_avg2_test = np.mean(actv_avg1, axis=0)
-				np.sum(actv_avg2 == actv_avg2_test)
-				
-				if self.avg_type == 'power_avg':
-					actv_avg2 = np.sqrt(actv_avg2)
+				# actv_avg1_test = np.mean(actv_expand, axis=0)
+				# actv_avg2_test = np.mean(actv_avg1, axis=0)
+				# np.sum(actv_avg2 == actv_avg2_test)
 				
 				detached_activations[k] = actv_avg2
 			
@@ -115,24 +110,17 @@ class SaveOutput:
 					actv_avg1 = np.mean(actv_expand, axis=1)
 					actv_avg2 = np.mean(actv_avg1, axis=0)
 					
-					if self.avg_type == 'power_avg':
-						actv_avg2 = np.sqrt(actv_avg2)
-					
 					detached_activations[k] = actv_avg2
 				else:
 					print(f'Not 4d ReLu. Layer number {k_split}')
 					# mean over frames
 					actv_avg1 = np.mean(activations, axis=0)
-					if self.avg_type == 'power_avg':
-						actv_avg1 = np.sqrt(actv_avg1)
 					
 					detached_activations[k] = actv_avg1
 			
 			if k.startswith('Linear'):
 				# mean over frames
 				actv_avg1 = np.mean(activations, axis=0)
-				if self.avg_type == 'power_avg':
-					actv_avg1 = np.sqrt(actv_avg1)
 				
 				detached_activations[k] = actv_avg1
 		
