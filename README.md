@@ -27,7 +27,7 @@ Edits to the original model: ReLU activations were changed to not be performed i
 
 To run random network: In the vggish.py script, it is possible to generate randomly permuted tensors for the VGGish architecture (line 137, class VGGish). The permuted architecture can be loaded in lines 147-156 (class VGGish, remove the commented parts).
 
-*Note*: When I downloaded the pretrained weights and scripts under /torchvggish/ these were automatically placed under /Users/{USER}/.cache/torch/hub/harritaylor_torchvggish_master/.
+*Note*: When I downloaded the pretrained weights and scripts under /torchvggish/ these were automatically placed under /Users/{USER}/.cache/torch/hub/harritaylor_torchvggish_master/. I moved these back to /torchvvgish/ after my edits.
 
 
 <hr>
