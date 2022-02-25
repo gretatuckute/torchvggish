@@ -22,6 +22,9 @@ class SaveOutput:
 		self.activations[layer_name] = module_out
 	
 	def define_layer_names(self, module):
+		"""Define the layer name (key) for the dictionary for storing activations.
+		If a layer name has already occurred, count occurrences, and append a number."""
+		
 		layer_name = str(module)
 		current_layer_names = list(self.activations.keys())
 		
