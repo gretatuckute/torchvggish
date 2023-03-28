@@ -26,6 +26,7 @@ To extract activations from multiple sound files, use run_model.py.
 Edits to the original model: ReLU activations were changed to not be performed inplace.
 
 To run random network: In the vggish.py script, it is possible to generate randomly permuted tensors for the VGGish architecture (line 137, class VGGish). The permuted architecture can be loaded in lines 147-156 (class VGGish, remove the commented parts).
+Also remember to change the filename such that we don't overwrite: https://github.com/gretatuckute/torchvggish/blob/2f49b6e16c3b5dec3fe28513f7cd24a59046f302/extractor_utils.py#L137 
 
 *Note*: When I downloaded the pretrained weights and scripts under /torchvggish/ these were automatically placed under /Users/{USER}/.cache/torch/hub/harritaylor_torchvggish_master/. I moved these back to /torchvvgish/ after my edits.
 
