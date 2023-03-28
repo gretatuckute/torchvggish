@@ -14,7 +14,7 @@ random.seed(0)
 torch.manual_seed(0)
 torch.cuda.manual_seed(0)
 
-sound_level_check = 0.1 # If not None, multiply the sound by this value and extract model activations
+sound_level_check = 100 # If not None, multiply the sound by this value and extract model activations
 
 RESULTDIR = '/Users/gt/Documents/GitHub/aud-dnn/aud_dnn/model-actv/VGGish/'
 
