@@ -134,34 +134,34 @@ class VGGish(VGG):
         if pretrained:
             state_dict = hub.load_state_dict_from_url(urls['vggish'], progress=progress)
 
-            # randnetw = False
-            #
-            # if randnetw:
-            #     ## The following code was used to generate indices for random permutation ##
-            #     if not os.path.exists(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl')):
-            #         print(f'Generating random indices for permuted architecture')
-            #         d_rand_idx = {}  # create dict for storing the indices for random permutation
-            #         for k, v in state_dict.items():
-            #             w = state_dict[k]
-            #             idx = torch.randperm(w.nelement())  # create random indices across all dimensions
-            #             d_rand_idx[k] = idx
-            #
-            #         with open(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl'), 'wb') as f:
-            #             pickle.dump(d_rand_idx, f)
-            #
-            #     else:
-            #         d_rand_idx = pickle.load(open(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl'), 'rb'))
-            #
-            #     print('OBS! RANDOM NETWORK!')
-            #
-            #     for k, v in state_dict.items():
-            #         w = state_dict[k]
-            #         # Load random indices
-            #         print(f'________ Loading random indices from permuted architecture for {k} ________')
-            #         d_rand_idx = pickle.load(open(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl'), 'rb'))
-            #         idx = d_rand_idx[k]
-            #         rand_w = w.view(-1)[idx].view(w.size()) # permute, and reshape back to original shape
-            #         state_dict[k] = rand_w
+            randnetw = True
+
+            if randnetw:
+                print('OBS! RANDOM NETWORK!')
+
+                ## The following code was used to generate indices for random permutation ##
+                if not os.path.exists(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl')):
+                    print(f'Generating random indices for permuted architecture')
+                    d_rand_idx = {}  # create dict for storing the indices for random permutation
+                    for k, v in state_dict.items():
+                        w = state_dict[k]
+                        idx = torch.randperm(w.nelement())  # create random indices across all dimensions
+                        d_rand_idx[k] = idx
+
+                    with open(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl'), 'wb') as f:
+                        pickle.dump(d_rand_idx, f)
+
+                else:
+                    d_rand_idx = pickle.load(open(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl'), 'rb'))
+
+                for k, v in state_dict.items():
+                    w = state_dict[k]
+                    # Load random indices
+                    print(f'________ Loading random indices from permuted architecture for {k} ________')
+                    d_rand_idx = pickle.load(open(os.path.join(os.getcwd(), 'VGGish_randnetw_indices.pkl'), 'rb'))
+                    idx = d_rand_idx[k]
+                    rand_w = w.view(-1)[idx].view(w.size()) # permute, and reshape back to original shape
+                    state_dict[k] = rand_w
 
                 # if visualizing:
                 # import matplotlib.pyplot as plt
