@@ -1,7 +1,9 @@
 import torch
 import numpy as np
+import os
 from os import listdir
 from os.path import isfile, join
+import matplotlib.pyplot as plt
 
 # import extractor hook functions
 from extractor_utils import SaveOutput
@@ -13,6 +15,8 @@ torch.manual_seed(0)
 torch.cuda.manual_seed(0)
 
 RESULTDIR = '/Users/gt/Documents/GitHub/aud-dnn/aud_dnn/model-actv/VGGish/'
+if not os.path.exists(RESULTDIR):
+	os.makedirs(RESULTDIR)
 DATADIR = '/Users/gt/Documents/GitHub/aud-dnn/data/stimuli/165_natural_sounds_16kHz/'
 
 files = [f for f in listdir(DATADIR) if isfile(join(DATADIR, f))]
@@ -23,7 +27,7 @@ model = torch.hub.load('harritaylor/torchvggish', 'vggish')
 ### LOOP OVER AUDIO FILES ###
 for filename in wav_files:
 	model.eval()
-	
+
 	# Write hooks for the model
 	save_output = SaveOutput(avg_type='avg')
 	
