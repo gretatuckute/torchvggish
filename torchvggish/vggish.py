@@ -134,7 +134,7 @@ class VGGish(VGG):
         if pretrained:
             state_dict = hub.load_state_dict_from_url(urls['vggish'], progress=progress)
 
-            randnetw = True
+            randnetw = False
 
             if randnetw:
                 print('OBS! RANDOM NETWORK!')

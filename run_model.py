@@ -14,10 +14,25 @@ random.seed(0)
 torch.manual_seed(0)
 torch.cuda.manual_seed(0)
 
+sound_level_check = 0.1 # If not None, multiply the sound by this value and extract model activations
+
 RESULTDIR = '/Users/gt/Documents/GitHub/aud-dnn/aud_dnn/model-actv/VGGish/'
+
+if sound_level_check is not None:
+	print(f'WARNING: Sound level check is set to {sound_level_check}')
+	# If period in the sound level, drop it
+	if '.' in str(sound_level_check):
+		sound_level_check_str = str(sound_level_check).replace('.', '')
+	else:
+		sound_level_check_str = str(sound_level_check)
+	RESULTDIR = RESULTDIR[:-1] + f'SL{sound_level_check_str}'
+
+
 if not os.path.exists(RESULTDIR):
 	os.makedirs(RESULTDIR)
 DATADIR = '/Users/gt/Documents/GitHub/aud-dnn/data/stimuli/165_natural_sounds_16kHz/'
+if sound_level_check is not None:
+	DATADIR = DATADIR[:-1] + f'_SL{sound_level_check_str}/'
 
 files = [f for f in listdir(DATADIR) if isfile(join(DATADIR, f))]
 wav_files = [f for f in files if f.endswith('wav')]
